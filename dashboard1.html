@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="ltr">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI UI Replica - Telegram Full Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WormGPT - Red Edition</title>
     <!-- Telegram Web App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,11 +14,11 @@
             color: #ffffff; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             overflow: hidden;
+            touch-action: manipulation;
         }
         
-        /* Sidebar Styles */
         #sidebar {
-            transition: transform 0.3s ease-in-out;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 200;
         }
         
@@ -26,30 +26,30 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 16px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 12px;
             color: #ececec;
             font-size: 15px;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
             cursor: pointer;
         }
 
-        .sidebar-item:hover { background-color: #202123; }
+        .sidebar-item:active { background-color: #1a0a0a; transform: scale(0.98); }
 
         .search-container {
-            background-color: #202123;
-            border: 1px solid #333;
-            border-radius: 8px;
+            background-color: #111111;
+            border: 1px solid #222222;
+            border-radius: 10px;
             padding: 8px 12px;
         }
 
         #overlay {
             display: none;
-            background-color: rgba(0, 0, 0, 0.6);
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
             z-index: 150;
         }
 
-        /* Avatar Styling */
         .user-photo {
             width: 100%;
             height: 100%;
@@ -57,18 +57,18 @@
             border-radius: 50%;
         }
 
-        /* Main Elements Styling */
         .plus-btn {
-            background: linear-gradient(90deg, #4b48ff, #9b6dff);
+            background: linear-gradient(90deg, #ff1a1a, #800000);
             border-radius: 9999px;
-            padding: 6px 16px;
-            font-weight: 500;
-            font-size: 14px;
+            padding: 8px 18px;
+            font-weight: 600;
+            font-size: 13px;
+            box-shadow: 0 4px 15px rgba(255, 26, 26, 0.3);
         }
 
         .input-area {
-            background-color: #171717;
-            border: 1px solid #333333;
+            background-color: #0d0d0d;
+            border: 1px solid #222222;
             border-radius: 28px;
         }
 
@@ -76,65 +76,66 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 12px 18px;
-            border-radius: 24px;
-            border: 1px solid #262626;
-            background-color: transparent;
+            padding: 14px 18px;
+            border-radius: 20px;
+            border: 1px solid #1a1a1a;
+            background-color: #050505;
             font-size: 14px;
             color: #d1d1d1;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
+            text-align: left;
         }
 
-        .action-chip:hover { background-color: #171717; }
+        .action-chip:active { background-color: #1a0a0a; transform: scale(0.97); }
 
-        /* Modal Styles */
         #subscriptionModal {
             display: none;
             position: fixed;
             inset: 0;
-            background-color: rgba(0, 0, 0, 0.95);
+            background-color: #000;
             z-index: 300;
             overflow-y: auto;
         }
 
-        .modal-content {
-            background-color: #000;
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
-            min-height: 100vh;
-            padding: 20px;
-            position: relative;
-        }
-
         .upgrade-btn {
-            background-color: #ffffff;
-            color: #000000;
+            background-color: #ff1a1a;
+            color: #ffffff;
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             border-radius: 30px;
-            font-weight: 600;
+            font-weight: 800;
             font-size: 16px;
             margin-top: 20px;
             display: block;
             text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(255, 26, 26, 0.4);
         }
 
-        .logo-img {
-            width: 128px;
-            height: 128px;
-            object-fit: contain;
+        /* Crown animation */
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .crown-icon {
+            animation: bounce-slow 2s infinite ease-in-out;
+            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+        }
+
+        .red-glow {
+            text-shadow: 0 0 10px rgba(255, 26, 26, 0.5);
         }
     </style>
 </head>
-<body class="flex flex-col h-screen">
+<body class="flex flex-col h-screen" dir="ltr">
 
     <!-- Sidebar -->
-    <div id="sidebar" class="fixed top-0 left-0 h-full w-[280px] bg-[#000000] border-r border-zinc-800 p-4 transform -translate-x-full">
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-[280px] bg-[#050505] border-r border-zinc-900 p-4 transform -translate-x-full">
         <div class="flex items-center gap-2 mb-6">
             <div class="search-container flex items-center flex-grow gap-2">
-                <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
-                <input type="text" placeholder="Search" class="bg-transparent border-none outline-none text-sm w-full text-white">
+                <i class="fa-solid fa-magnifying-glass text-gray-500 text-sm"></i>
+                <input type="text" placeholder="Search..." class="bg-transparent border-none outline-none text-sm w-full text-white">
             </div>
             <button class="p-2 hover:bg-zinc-800 rounded-lg" onclick="showModal()">
                 <i class="fa-regular fa-pen-to-square text-lg text-white"></i>
@@ -143,37 +144,40 @@
 
         <nav class="space-y-1">
             <div class="sidebar-item" onclick="showModal()">
-                <i class="fa-regular fa-message text-lg"></i>
-                <span>New chat</span>
+                <i class="fa-regular fa-message text-lg text-red-500"></i>
+                <span>New Chat</span>
             </div>
             <div class="sidebar-item" onclick="showModal()">
-                <i class="fa-regular fa-images text-lg"></i>
-                <span>Images</span>
+                <i class="fa-regular fa-images text-lg text-red-400"></i>
+                <span>Image Generation</span>
             </div>
             <div class="sidebar-item" onclick="showModal()">
-                <i class="fa-solid fa-table-cells-large text-lg"></i>
-                <span>Apps</span>
+                <i class="fa-solid fa-table-cells-large text-lg text-red-600"></i>
+                <span>Tools & Apps</span>
             </div>
             
-            <div class="pt-4 mt-4 border-t border-zinc-800">
+            <div class="pt-4 mt-4 border-t border-zinc-900">
                 <div class="sidebar-item" onclick="showModal()">
-                    <i class="fa-regular fa-folder-open text-lg"></i>
-                    <span>New project</span>
+                    <i class="fa-regular fa-folder-open text-lg text-zinc-500"></i>
+                    <span>Projects</span>
                 </div>
             </div>
         </nav>
 
         <!-- User Profile Bottom (Sidebar) -->
-        <div class="absolute bottom-4 left-4 right-4">
-            <button class="sidebar-item w-full justify-between" onclick="showModal()">
+        <div class="absolute bottom-6 left-4 right-4">
+            <button class="sidebar-item w-full justify-between bg-zinc-900/30 border border-white/5" onclick="showModal()">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-zinc-800 overflow-hidden border border-zinc-700 flex items-center justify-center">
+                    <div class="w-10 h-10 rounded-full bg-zinc-800 overflow-hidden border border-red-900/30 flex items-center justify-center">
                         <img id="sidebarUserImg" src="" alt="" class="user-photo hidden">
-                        <i id="sidebarUserIcon" class="fa-solid fa-user text-xs"></i>
+                        <i id="sidebarUserIcon" class="fa-solid fa-user text-zinc-600"></i>
                     </div>
-                    <span id="sidebarUserName" class="font-medium">Guest User</span>
+                    <div class="flex flex-col items-start text-left">
+                        <span id="sidebarUserName" class="font-bold text-sm">Guest User</span>
+                        <span class="text-[10px] text-red-500 font-bold uppercase tracking-wider">Free Node</span>
+                    </div>
                 </div>
-                <i class="fa-solid fa-chevron-down text-[10px] text-gray-500"></i>
+                <i class="fa-solid fa-chevron-right text-[10px] text-gray-500"></i>
             </button>
         </div>
     </div>
@@ -182,69 +186,65 @@
 
     <!-- Header -->
     <header class="flex items-center justify-between p-4 pt-6 relative z-10">
-        <div class="flex items-center gap-4">
-            <!-- Replaced Hamburger Menu with logo.png -->
-            <button class="w-20 h-20 flex items-center justify-center bg-[#171717] rounded-full overflow-hidden" onclick="toggleSidebar()">
-                <img src="logo.png" alt="Logo" class="logo-img" onerror="this.src='https://img.icons8.com/ios-filled/50/ffffff/menu--v1.png';">
+        <div class="flex items-center gap-3">
+            <button class="w-12 h-12 flex items-center justify-center bg-[#0d0d0d] rounded-xl border border-red-900/20" onclick="toggleSidebar()">
+                <i class="fa-solid fa-bars-staggered text-red-500"></i>
             </button>
             <button class="plus-btn flex items-center gap-2" onclick="showModal()">
-                <i class="fa-solid fa-sparkles text-sm text-white"></i>
+                <i class="fa-solid fa-bolt text-xs"></i>
                 Get Plus
             </button>
         </div>
         
         <!-- Header User Avatar -->
-        <div class="relative flex items-center justify-center w-[60px] h-[60px]" onclick="showModal()">
-            <img src="crown.png" alt="Crown" class="absolute -top-1 w-11 z-10" onerror="this.style.display='none'">
-            <div class="w-10 h-10 rounded-full bg-[#1a0505] border-2 border-red-600 overflow-hidden flex items-center justify-center z-0">
-                <img id="headerUserImg" src="" alt="" class="user-photo hidden">
-                <i id="headerUserIcon" class="fa-solid fa-user text-red-600 text-lg"></i>
+        <div class="relative flex items-center justify-center w-[50px] h-[50px]" onclick="showModal()">
+            <img src="https://img.icons8.com/emoji/48/crown-emoji.png" alt="Crown" class="crown-icon absolute -top-4 w-8 z-10">
+            <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-red-600 to-black p-[2px] z-0 shadow-[0_0_15px_rgba(255,0,0,0.2)]">
+                <div class="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center">
+                    <img id="headerUserImg" src="" alt="" class="user-photo hidden">
+                    <i id="headerUserIcon" class="fa-solid fa-user text-white text-lg"></i>
+                </div>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="flex-grow flex flex-col items-center justify-center px-6">
-        <h1 class="text-3xl font-semibold mb-8 tracking-tight text-white text-center">What can I help with?</h1>
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-black mb-2 tracking-tight">Hello, <span id="welcomeName" class="text-red-600 red-glow">Guest</span></h1>
+            <p class="text-zinc-500 text-sm">How can I assist your operation today?</p>
+        </div>
 
         <div class="grid grid-cols-2 gap-3 w-full max-w-md">
             <button class="action-chip" onclick="showModal()">
-                <i class="fa-regular fa-image text-green-400"></i>
-                Create image
+                <i class="fa-regular fa-image text-red-500"></i>
+                Generate Image
             </button>
             <button class="action-chip" onclick="showModal()">
-                <i class="fa-solid fa-user-ninja text-blue-400"></i>
-                Hack learning
+                <i class="fa-solid fa-terminal text-red-500"></i>
+                Code Exploit
             </button>
             <button class="action-chip" onclick="showModal()">
-                <i class="fa-solid fa-mask text-red-400"></i>
-                Scam tricks
+                <i class="fa-solid fa-shield-halved text-red-500"></i>
+                Pen-Testing
             </button>
             <button class="action-chip" onclick="showModal()">
-                <i class="fa-regular fa-eye text-purple-400"></i>
-                Analyze images
-            </button>
-             <button class="action-chip" onclick="showModal()">
-                <i class="fa-solid fa-graduation-cap text-teal-400"></i>
-                Get advice
-            </button>
-            <button class="action-chip" onclick="showModal()">
-                <i class="fa-solid fa-code text-blue-400"></i>
-                Code
+                <i class="fa-solid fa-wand-magic-sparkles text-red-500"></i>
+                Deep Analysis
             </button>
         </div>
     </main>
 
     <!-- Bottom Input Area -->
-    <footer class="p-4 pb-8 w-full max-w-2xl mx-auto">
+    <footer class="p-4 pb-10 w-full max-w-2xl mx-auto">
         <div class="flex items-center gap-3">
-            <button class="w-11 h-11 flex items-center justify-center bg-[#171717] rounded-full flex-shrink-0" onclick="showModal()">
-                <i class="fa-solid fa-plus text-white"></i>
+            <button class="w-12 h-12 flex items-center justify-center bg-[#0d0d0d] rounded-full border border-zinc-800" onclick="showModal()">
+                <i class="fa-solid fa-paperclip text-zinc-400"></i>
             </button>
             <div class="input-area flex flex-grow items-center px-4 py-3">
-                <input type="text" placeholder="Ask anything..." class="bg-transparent border-none outline-none flex-grow text-white placeholder-gray-500 text-lg" readonly onclick="showModal()">
-                <button class="ml-2 w-10 h-10 flex items-center justify-center bg-white rounded-full text-black" onclick="showModal()">
-                    <i class="fa-solid fa-arrow-up text-lg"></i>
+                <input type="text" placeholder="Ask anything..." class="bg-transparent border-none outline-none flex-grow text-white placeholder-zinc-700 text-base" readonly onclick="showModal()">
+                <button class="ml-2 w-9 h-9 flex items-center justify-center bg-red-600 rounded-full text-white shadow-lg shadow-red-600/20" onclick="showModal()">
+                    <i class="fa-solid fa-arrow-up text-sm"></i>
                 </button>
             </div>
         </div>
@@ -252,75 +252,85 @@
 
     <!-- Subscription Modal -->
     <div id="subscriptionModal">
-        <div class="modal-content">
-            <button onclick="hideModal()" class="w-10 h-10 flex items-center justify-center bg-zinc-900 rounded-full mb-6">
-                <i class="fa-solid fa-arrow-left text-white"></i>
+        <div class="p-6">
+            <button onclick="hideModal()" class="w-12 h-12 flex items-center justify-center bg-zinc-900 rounded-full mb-8">
+                <i class="fa-solid fa-xmark text-white"></i>
             </button>
 
-            <h2 class="text-4xl font-bold mb-2 text-white">WormGPT <span class="text-indigo-400">Plus</span></h2>
-            <p class="text-gray-400 mb-6">Get more access with advanced intelligence and agents</p>
-
-            <div class="flex bg-[#171717] p-1 rounded-xl mb-6">
-                <div class="flex-1 text-center py-1 bg-[#2c2c2e] rounded-lg text-white font-medium">subscriptions</div>
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-black mb-2">WormGPT <span class="text-red-600">PLUS</span></h2>
+                <p class="text-zinc-400">Unleash the full red-team potential</p>
             </div>
 
-            <div class="border border-zinc-800 rounded-2xl p-4 mb-6">
-                <div class="flex justify-between items-center py-3 border-b border-zinc-900">
-                    <span class="text-sm">Access to GPT-5</span>
-                    <i class="fa-solid fa-check text-indigo-400"></i>
+            <div class="space-y-4 mb-8">
+                <div class="flex items-center gap-4 bg-zinc-950 p-4 rounded-2xl border border-red-900/20">
+                    <div class="w-10 h-10 rounded-full bg-red-600/10 flex items-center justify-center">
+                        <i class="fa-solid fa-brain text-red-600"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm">GPT-5 Cyber Model</h4>
+                        <p class="text-xs text-zinc-500">Advanced reasoning & zero limits.</p>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center py-3 border-b border-zinc-900">
-                    <span class="text-sm">Advanced reasoning</span>
-                    <i class="fa-solid fa-check text-indigo-400"></i>
+                <div class="flex items-center gap-4 bg-zinc-950 p-4 rounded-2xl border border-red-900/20">
+                    <div class="w-10 h-10 rounded-full bg-red-600/10 flex items-center justify-center">
+                        <i class="fa-solid fa-user-secret text-red-600"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm">Red Teaming Tools</h4>
+                        <p class="text-xs text-zinc-500">No ethical boundaries for researchers.</p>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center py-3 border-b border-zinc-900">
-                    <span class="text-sm">More memory</span>
-                    <i class="fa-solid fa-check text-indigo-400"></i>
-                </div>
-                <div class="flex justify-between items-center py-3 border-b border-zinc-900">
-                    <span class="text-sm">Hack learning</span>
-                    <i class="fa-solid fa-check text-indigo-400"></i>
-                </div>
-                <div class="flex justify-between items-center py-3">
-                    <span class="text-sm">no limits</span>
-                    <i class="fa-solid fa-check text-indigo-400"></i>
+                <div class="flex items-center gap-4 bg-zinc-950 p-4 rounded-2xl border border-red-900/20">
+                    <div class="w-10 h-10 rounded-full bg-red-600/10 flex items-center justify-center">
+                        <i class="fa-solid fa-bolt text-red-600"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm">Priority Infrastructure</h4>
+                        <p class="text-xs text-zinc-500">Instant responses during peak load.</p>
+                    </div>
                 </div>
             </div>
 
-            <a href="pay.html" class="upgrade-btn">Upgrade to Plus</a>
-            <p class="text-center text-xs text-gray-500 mt-4">Renews for $ 15/month.</p>
+            <a href="pay.html" class="upgrade-btn">Upgrade Now - $15</a>
+            <p class="text-center text-[10px] text-zinc-600 mt-6 uppercase tracking-widest">WormGPT Enterprise Node</p>
         </div>
     </div>
 
     <script>
-        // Initialize Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.headerColor = '#000000';
+        tg.backgroundColor = '#000000';
 
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
         const modal = document.getElementById('subscriptionModal');
 
-        // Get user data from Telegram
-        const user = tg.initDataUnsafe?.user;
-
-        if (user) {
-            const fullName = `${user.first_name} ${user.last_name || ''}`.trim();
-            document.getElementById('sidebarUserName').innerText = fullName;
-
-            if (user.photo_url) {
-                const elements = ['headerUserImg', 'sidebarUserImg'];
-                const icons = ['headerUserIcon', 'sidebarUserIcon'];
+        function initUserData() {
+            const user = tg.initDataUnsafe?.user;
+            
+            if (user) {
+                const firstName = user.first_name || 'Guest';
+                const fullName = `${user.first_name} ${user.last_name || ''}`.trim();
                 
-                elements.forEach(id => {
-                    const img = document.getElementById(id);
-                    img.src = user.photo_url;
-                    img.classList.remove('hidden');
-                });
+                document.getElementById('sidebarUserName').innerText = fullName;
+                document.getElementById('welcomeName').innerText = firstName;
 
-                icons.forEach(id => {
-                    document.getElementById(id).classList.add('hidden');
-                });
+                if (user.photo_url) {
+                    const imgElements = ['headerUserImg', 'sidebarUserImg'];
+                    const iconElements = ['headerUserIcon', 'sidebarUserIcon'];
+                    
+                    imgElements.forEach(id => {
+                        const img = document.getElementById(id);
+                        img.src = user.photo_url;
+                        img.classList.remove('hidden');
+                    });
+
+                    iconElements.forEach(id => {
+                        document.getElementById(id).classList.add('hidden');
+                    });
+                }
             }
         }
 
@@ -337,17 +347,17 @@
 
         function showModal() {
             modal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
             sidebar.style.transform = 'translateX(-100%)';
             overlay.style.display = 'none';
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
         }
 
         function hideModal() {
             modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
         }
 
-        // Close on escape key
+        window.onload = initUserData;
+
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 hideModal();
