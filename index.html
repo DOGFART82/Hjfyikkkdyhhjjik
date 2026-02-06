@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المقدمة | Intro</title>
+    <style>
+        /* إعدادات الصفحة الأساسية */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000; /* خلفية سوداء */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+
+        /* حاوية الصورة */
+        .intro-container {
+            text-align: center;
+        }
+
+        /* تصميم الرسوم المتحركة للصورة */
+        .intro-image {
+            width: 120px; /* يمكنك تعديل الحجم حسب الرغبة */
+            height: auto;
+            border-radius: 50%; /* اختياري: لجعل الصورة دائرية */
+            
+            /* تفعيل الرسوم المتحركة */
+            animation: rotateAndScale 3s ease-in-out forwards;
+            
+            /* fallback في حال عدم توفر الصورة */
+            background: #222; 
+            display: block;
+        }
+
+        /* تعريف حركة الدوران 360 درجة مع تأثير التكبير والتلاشي */
+        @keyframes rotateAndScale {
+            0% {
+                transform: rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: rotate(180deg) scale(1.2);
+                opacity: 1;
+            }
+            80% {
+                transform: rotate(360deg) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(360deg) scale(1);
+                opacity: 0; /* التلاشي قبل الانتقال */
+            }
+        }
+
+        /* رسالة انتظار بسيطة */
+        .loading-text {
+            color: #ffffff;
+            margin-top: 20px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            opacity: 0.7;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="intro-container">
+        <!-- الصورة المطلوبة -->
+        <img src="intro.png" alt="Intro Image" class="intro-image" onerror="this.alt='جاري التحميل...';">
+        <div class="loading-text"></div>
+    </div>
+
+    <script>
+        // وظيفة التوجيه التلقائي
+        window.onload = function() {
+            // الانتظار لمدة 3.5 ثانية (مدة الأنميشن + نصف ثانية إضافية)
+            setTimeout(function() {
+                // التوجه إلى الصفحة الرئيسية
+                window.location.href = 'main.html';
+            }, 1500);
+        };
+    </script>
+</body>
+</html>
+
