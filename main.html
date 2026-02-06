@@ -2,8 +2,8 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatGPT - Welcome</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WormGPT - Welcome</title>
     <!-- Telegram Mini App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Tailwind CSS -->
@@ -13,42 +13,37 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #000000;
+            background-color: #0a0000; /* خلفية سوداء مائلة للأحمر العميق */
             color: #ffffff;
             -webkit-tap-highlight-color: transparent;
-            /* تم تعديل الهامش العلوي ليكون 1.5rem بالضبط */
+            /* الهوامش المطلوبة */
             padding-top: 1.5rem; 
+            /* زيادة الهامش السفلي لضمان عدم التداخل مع أزرار النظام */
+            padding-bottom: 2.5rem; 
+            overflow-x: hidden;
         }
 
         .glass-card {
-            background-color: #0d0d0d;
-            border: 1px solid #262626;
+            background-color: #1a0505; 
+            border: 1px solid #451010; 
             border-radius: 16px;
         }
 
         .btn-telegram {
-            background-color: #24A1DE;
+            background-color: #cc0000; 
             color: #ffffff;
             transition: all 0.2s;
             position: relative;
+            box-shadow: 0 4px 15px rgba(204, 0, 0, 0.3);
         }
 
         .btn-telegram:active {
             transform: scale(0.98);
-        }
-
-        .btn-outline {
-            border: 1px solid #404040;
-            background-color: transparent;
-            transition: background-color 0.2s;
-        }
-
-        .btn-outline:active {
-            background-color: #1a1a1a;
+            background-color: #a80000;
         }
 
         .text-secondary {
-            color: #b3b3b3;
+            color: #d1a7a7; 
         }
 
         .icon-container {
@@ -74,66 +69,78 @@
         #user-profile-preview {
             display: none;
         }
+
+        .gradient-text {
+            background: linear-gradient(to right, #ff4d4d, #990000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* حاوية الأزرار السفلية مع مراعاة مساحة أزرار الهاتف */
+        .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 1.5rem);
+        }
     </style>
 </head>
-<body class="flex flex-col min-h-screen px-6 pb-8">
+<body class="flex flex-col min-h-screen px-6">
 
     <!-- Main Header -->
-    <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold mb-4">Welcome to WormGPT</h1>
-        <p class="text-lg text-gray-300 leading-relaxed">
-            The unofficial app by OpenAI is Premium,​"It has no restrictions or limits; it can assist you even in illegal research. We note that you are entirely responsible for any illegal use of our AI."  </p>
+    <div class="text-center mb-6">
+        <h1 class="text-3xl font-bold mb-4 gradient-text">Welcome to WormGPT</h1>
+        <p class="text-lg text-red-100/80 leading-relaxed px-2">
+            The unofficial app by OpenAI is Premium,​"It has no restrictions or limits; it can assist you even in illegal research. We note that you are entirely responsible for any illegal use of our AI."  
+        </p>
     </div>
 
     <!-- User Profile Preview -->
-    <div id="user-profile-preview" class="glass-card p-4 mb-6 flex items-center gap-4 border-blue-500/50">
-        <img id="user-photo" src="" alt="Profile" class="w-12 h-12 rounded-full border border-gray-700 hidden">
-        <div id="user-icon" class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center font-bold text-xl">?</div>
+    <div id="user-profile-preview" class="glass-card p-4 mb-6 flex items-center gap-4 border-red-600/50">
+        <img id="user-photo" src="" alt="Profile" class="w-12 h-12 rounded-full border border-red-900 hidden">
+        <div id="user-icon" class="w-12 h-12 bg-red-700 rounded-full flex items-center justify-center font-bold text-xl">?</div>
         <div>
-            <p class="text-sm text-gray-400">Connecting as</p>
+            <p class="text-sm text-red-300/60">Connecting as</p>
             <h3 id="user-name" class="font-bold text-white">Telegram User</h3>
         </div>
     </div>
 
     <!-- Info Section -->
-    <div class="space-y-8 mt-4">
+    <div class="space-y-6 mt-2 flex-grow">
         <div class="flex items-start gap-4">
             <div class="icon-container pt-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
             </div>
             <div>
                 <h2 class="font-medium text-white">ChatGPT can be inaccurate</h2>
-                <p class="text-secondary text-sm mt-1 leading-relaxed">ChatGPT may provide Information and instructions that violate international laws and lead to legal accountability in case of prohibited uses.</p>
+                <p class="text-secondary text-sm mt-1 leading-relaxed">ChatGPT may provide Information and instructions that violate international laws and lead to legal accountability.</p>
             </div>
         </div>
 
-        <div class="border-t border-gray-800"></div>
+        <div class="border-t border-red-900/20"></div>
 
         <div class="flex items-start gap-4">
             <div class="icon-container pt-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             </div>
             <div>
                 <h2 class="font-medium text-white">Don't share sensitive info</h2>
                 <p class="text-secondary text-sm mt-1 leading-relaxed">
                     Chats may be reviewed and used to train our models. 
-                    <a href="#" class="underline text-white">Learn about your choices</a>.
+                    <a href="#" class="underline text-red-400">Learn about choices</a>.
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Actions -->
-    <div class="mt-auto space-y-4">
+    <!-- Bottom Actions Area -->
+    <div class="mt-auto space-y-4 pt-6 safe-area-bottom">
         
         <div class="glass-card p-4 text-center">
-            <p class="text-xs text-gray-400 leading-relaxed">
+            <p class="text-[10px] text-red-200/50 leading-relaxed">
                 By continuing, you agree to our <a href="#" class="underline">Terms</a> and acknowledge that you have read our <a href="#" class="underline">Privacy Policy</a>.
             </p>
         </div>
 
         <!-- Telegram Button with Loader -->
-        <button id="telegram-btn" onclick="handleTelegramAuth()" class="btn-telegram w-full py-4 rounded-full font-semibold flex items-center justify-center gap-3">
+        <button id="telegram-btn" onclick="handleTelegramAuth()" class="btn-telegram w-full py-4 rounded-full font-semibold flex items-center justify-center gap-3 mb-2">
             <span id="btn-text" class="flex items-center gap-3">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M21.435 2.582a1.933 1.933 0 0 0-1.93-.347L2.181 8.74a1.933 1.933 0 0 0 .105 3.567l4.811 1.54 1.884 5.91a1.933 1.933 0 0 0 3.328.618l2.91-3.267 4.706 3.444c.82.6 1.97.16 2.19-.82l3.41-15.11a1.933 1.933 0 0 0-1.094-2.042l-.005-.001Z" fill="white"/>
@@ -142,13 +149,14 @@
             </span>
             <div id="btn-loader" class="spinner"></div>
         </button>
-
-       
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.setHeaderColor('#0a0000');
+        // إخطار تلجرام بأن التطبيق يدعم Safe Area لضمان عدم التداخل
+        tg.ready();
 
         function handleTelegramAuth() {
             const btn = document.getElementById('telegram-btn');
@@ -156,17 +164,14 @@
             const btnLoader = document.getElementById('btn-loader');
             const preview = document.getElementById('user-profile-preview');
 
-            // 1. Show Loading inside button
             btnText.style.display = 'none';
             btnLoader.style.display = 'block';
             btn.disabled = true;
 
             const user = tg.initDataUnsafe?.user;
 
-            // Simulate server/auth delay
             setTimeout(() => {
                 if (user) {
-                    // 2. Hide button and show profile preview
                     btn.style.display = 'none';
                     preview.style.display = 'flex';
                     
@@ -182,21 +187,14 @@
 
                     tg.HapticFeedback.notificationOccurred('success');
 
-                    // 3. Final Redirect to Dashboard
                     setTimeout(() => {
                         window.location.href = 'dashboard1.html';
                     }, 1500);
                 } else {
-                    // Fallback for non-telegram environments for testing
                     tg.HapticFeedback.notificationOccurred('warning');
                     window.location.href = 'dashboard1.html';
                 }
             }, 1200);
-        }
-
-        function continueAsGuest() {
-            // Instant redirect for guest mode
-            window.location.href = 'dashboard1.html';
         }
     </script>
 </body>
